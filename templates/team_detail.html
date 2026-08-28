@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ team.name }}{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+  <div style="margin-bottom:0.5rem">
+    <a href="{{ url_for('tournament_detail', tournament_id=tournament.id) }}" style="color:var(--muted);font-size:0.85rem">← {{ tournament.name }}</a>
+  </div>
+  <h1>{{ team.name }}</h1>
+  <div class="loc"><span>👤</span> Captain: {{ team.captain.username }}</div>
+</div>
+
+<div class="detail-body">
+  <div class="detail-main">
+    <h3 style="font-size:1.1rem;margin-bottom:1rem">Squad ({{ members|length }} players)</h3>
+
+    {% if members %}
+      {% for m in members %}
+        <div class="member-card">
+          <div class="jersey">{{ m.jersey_number if m.jersey_number else '—' }}</div>
+          <div class="member-info">
+            <div class="member-name">{{ m.name }}</div>
+            <div class="member-pos">{{ m.position if m.position else 'No position set' }}</div>
+          </div>
+          {% if is_captain %}
+          <form method="POST" action="{{ url_for('delete_member', team_id=team.id, member_id=m.id) }}"
+                onsubmit="return confirm('Remove {{ m.name }} from the team?')">
+            <button type="submit" class="remove-member">✕</button>
+          </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state" style="padding:1.5rem">
+        <p>No squad members yet.{% if is_captain %} Add players using the form.{% endif %}</p>
+      </div>
+    {% endif %}
+
+    {% if is_captain %}
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+      <h3 style="font-size:1rem;margin-bottom:0.8rem">Add a player</h3>
+      <form method="POST" action="{{ url_for('add_member', team_id=team.id) }}" class="member-row">
+        <input type="text" name="name" class="form-control" placeholder="Player name" required>
+        <input type="text" name="position" class="form-control" placeholder="Position">
+        <input type="number" name="jersey" class="form-control jersey-input" placeholder="#" min="1" max="99">
+        <button type="submit" class="btn btn-primary btn-sm">Add</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="detail-side">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Tournament</div>
+        <div class="val" style="font-size:0.95rem">{{ tournament.name }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Squad Size</div>
+        <div class="val">{{ members|length }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Location</div>
+        <div class="val" style="font-size:0.95rem">{{ tournament.location }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Date</div>
+        <div class="val" style="font-size:0.9rem">{{ tournament.start_time|fmt_date }}</div>
+      </div>
+    </div>
+
+    {% if is_captain %}
+    <div class="actions" style="flex-direction:column">
+      <form method="POST" action="{{ url_for('withdraw_team', team_id=team.id) }}"
+            onsubmit="return confirm('Withdraw your team from {{ tournament.name }}? This cannot be undone.')">
+        <button type="submit" class="btn btn-danger btn-block">Withdraw Team</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

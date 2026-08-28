@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Tournaments{% endblock %}
+
+{% block content %}
+<div class="section">
+  <div class="section-head">
+    <div>
+      <h2>Browse Tournaments</h2>
+      <p>Find a tournament near you and register your team.</p>
+    </div>
+  </div>
+
+  <form method="GET" action="{{ url_for('tournaments') }}" class="search-bar">
+    <input type="text" name="q" class="form-control" placeholder="Search by name..." value="{{ q }}">
+    <select name="location" class="form-control">
+      <option value="">All locations</option>
+      {% for loc in locations %}
+        <option value="{{ loc }}" {% if location == loc %}selected{% endif %}>{{ loc }}</option>
+      {% endfor %}
+    </select>
+    <select name="status" class="form-control">
+      <option value="">All statuses</option>
+      <option value="open" {% if status == 'open' %}selected{% endif %}>Open</option>
+      <option value="closed" {% if status == 'closed' %}selected{% endif %}>Closed</option>
+      <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  {% if tournaments %}
+  <div class="grid grid-3">
+    {% for t in tournaments %}
+      <a href="{{ url_for('tournament_detail', tournament_id=t.id) }}" class="t-card">
+        <div class="t-card-head">
+          <h3>{{ t.name }}</h3>
+          <span class="t-status status-{{ t.status }}">{{ t.status }}</span>
+        </div>
+        {% if t.description %}
+          <p style="color:var(--muted);font-size:0.85rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ t.description }}</p>
+        {% endif %}
+        <div class="t-meta">
+          <div class="t-meta-item"><span class="icon">📍</span> {{ t.location }}</div>
+          <div class="t-meta-item"><span class="icon">🗓️</span> {{ t.start_time|fmt_date }}</div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat"><span class="val" style="color:var(--gold)">{{ t.prize_pool|currency(t.currency) }}</span><span class="label">Prize Pool</span></div>
+          <div class="t-stat"><span class="val">{{ t.team_count }}/{{ t.max_teams }}</span><span class="label">Teams</span></div>
+          <div class="t-stat"><span class="val" style="color:var(--lime)">{{ t.entry_fee|currency(t.currency) }}</span><span class="label">Entry Fee</span></div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="icon">🔍</div>
+    <h3>No tournaments found</h3>
+    <p>Try adjusting your search, or check back later for new tournaments.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

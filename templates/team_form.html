@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Register Team{% endblock %}
+
+{% block content %}
+<div class="form-wrap" style="max-width:680px">
+  <div class="form-card">
+    <h2>Register Your Team</h2>
+    <p class="sub">For <strong>{{ tournament.name }}</strong> · {{ tournament.location }}</p>
+
+    <form method="POST" action="{{ url_for('register_team', tournament_id=tournament.id) }}" id="team-form">
+      <div class="form-group">
+        <label>Team Name</label>
+        <input type="text" name="name" class="form-control" placeholder="FC Strikers" required
+               value="{{ form.get('name', '') }}">
+      </div>
+
+      <div style="margin-top:1.5rem">
+        <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:0.6rem">
+          Squad Members <span class="opt">(add your players)</span>
+        </label>
+        <div id="members-container">
+          <!-- member rows inserted by JS -->
+        </div>
+        <button type="button" class="add-member-btn" onclick="addMemberRow()">+ Add Player</button>
+      </div>
+
+      <div class="actions" style="flex-direction:column;gap:0.75rem;margin-top:2rem">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Register Team</button>
+        <a href="{{ url_for('tournament_detail', tournament_id=tournament.id) }}" class="btn btn-outline btn-block">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let memberIndex = 0;
+function addMemberRow(name='', position='', jersey='') {
+  const container = document.getElementById('members-container');
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.dataset.index = memberIndex;
+  row.innerHTML = `
+    <input type="text" name="members" class="form-control" placeholder="Player name" value="${name}">
+    <input type="text" name="positions" class="form-control" placeholder="Position (e.g. GK)" value="${position}">
+    <input type="number" name="jerseys" class="form-control jersey-input" placeholder="#" min="1" max="99" value="${jersey}">
+    <button type="button" class="remove-member" onclick="this.parentElement.remove()">✕</button>
+  `;
+  container.appendChild(row);
+  memberIndex++;
+}
+// Start with 3 empty rows
+addMemberRow();
+addMemberRow();
+addMemberRow();
+</script>
+{% endblock %}

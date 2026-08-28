@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="form-wrap">
+    <div class="form-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to manage your tournaments and teams.</p>
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control" placeholder="you@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Sign In</button>
+      </form>
+
+      <div class="auth-side">
+        New to Xtra Time? <a href="{{ url_for('register') }}">Create an account</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

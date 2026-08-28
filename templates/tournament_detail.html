@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+  <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem">
+    <span class="t-status status-{{ tournament.status }}">{{ tournament.status }}</span>
+    <span style="color:var(--muted);font-size:0.85rem">by {{ tournament.organizer.username }}</span>
+  </div>
+  <h1>{{ tournament.name }}</h1>
+  <div class="loc"><span>📍</span> {{ tournament.location }}</div>
+</div>
+
+<div class="detail-body">
+  <!-- Main -->
+  <div class="detail-main">
+    <h3 style="font-size:1.1rem;margin-bottom:0.5rem">About this tournament</h3>
+    {% if tournament.description %}
+      <p class="description">{{ tournament.description }}</p>
+    {% else %}
+      <p class="description">No description provided.</p>
+    {% endif %}
+
+    <h3 style="font-size:1.1rem;margin:2rem 0 1rem">
+      Registered Teams ({{ team_count }}/{{ tournament.max_teams }})
+    </h3>
+
+    {% if teams %}
+      {% for team in teams %}
+        <a href="{{ url_for('team_detail', team_id=team.id) }}" class="team-list-item">
+          <div class="team-info">
+            <div class="team-badge">{{ team.name[:2]|upper }}</div>
+            <div>
+              <div class="team-name">{{ team.name }}</div>
+              <div class="team-captain">Captain: {{ team.captain.username }} · {{ team.member_count }} players</div>
+            </div>
+          </div>
+          <span style="color:var(--lime);font-size:0.8rem">View →</span>
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state" style="padding:1.5rem">
+        <p>No teams registered yet. Be the first!</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Sidebar -->
+  <div class="detail-side">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Prize Pool</div>
+        <div class="val prize">{{ tournament.prize_pool|currency(tournament.currency) }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Entry Fee</div>
+        <div class="val fee">{{ tournament.entry_fee|currency(tournament.currency) }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Date & Time</div>
+        <div class="val" style="font-size:0.95rem">{{ tournament.start_time|fmt_date }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Spots Left</div>
+        <div class="val" style="color:{{ 'var(--lime)' if spots_left > 0 else 'var(--danger)' }}">{{ spots_left }} / {{ tournament.max_teams }}</div>
+      </div>
+    </div>
+
+    <div class="actions" style="flex-direction:column">
+      {% if current_user %}
+        {% if current_user.role == 'player' and tournament.status == 'open' and spots_left > 0 %}
+          <a href="{{ url_for('register_team', tournament_id=tournament.id) }}" class="btn btn-primary btn-block">
+            Register Your Team
+          </a>
+        {% elif current_user.role == 'player' and tournament.status == 'open' and spots_left == 0 %}
+          <button class="btn btn-outline btn-block" disabled>Tournament Full</button>
+        {% elif current_user.role == 'player' and tournament.status != 'open' %}
+          <button class="btn btn-outline btn-block" disabled>Registration Closed</button>
+        {% elif current_user.role == 'organizer' and not is_organizer %}
+          <p style="color:var(--muted);font-size:0.85rem;text-align:center">Organizers can only register teams from a player account.</p>
+        {% endif %}
+
+        {% if is_organizer %}
+          <a href="{{ url_for('edit_tournament', tournament_id=tournament.id) }}" class="btn btn-outline btn-block">Edit Tournament</a>
+          <form method="POST" action="{{ url_for('delete_tournament', tournament_id=tournament.id) }}" onsubmit="return confirm('Delete this tournament? This removes all registered teams.')">
+            <button type="submit" class="btn btn-danger btn-block">Delete Tournament</button>
+          </form>
+        {% endif %}
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary btn-block">Sign in to Register</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

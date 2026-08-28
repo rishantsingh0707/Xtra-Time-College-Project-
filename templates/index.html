@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1 class="animate-up">Organize. Team Up. <span class="accent">Play.</span></h1>
+    <p class="animate-up animate-up-1">
+      Xtra Time is your home for grassroots football tournaments. Organizers post
+      tournaments with prize pools and locations. Players build teams and register
+      in seconds.
+    </p>
+    <div class="hero-cta animate-up animate-up-2">
+      <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started Free</a>
+      <a href="{{ url_for('tournaments') }}" class="btn btn-outline btn-lg">Browse Tournaments</a>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Two ways to play</h2>
+      <p>Whether you run the show or play the game — we've got you covered.</p>
+    </div>
+  </div>
+  <div class="grid grid-2">
+    <div class="t-card">
+      <div style="font-size:2.5rem">📋</div>
+      <h3>I'm an Organizer</h3>
+      <p style="color:var(--muted);font-size:0.9rem">
+        Create a tournament in minutes. Set the name, prize pool, location, entry
+        fee, date and max teams. Watch teams register and fill the bracket.
+      </p>
+      <ul style="color:var(--muted);font-size:0.85rem;list-style:none;display:flex;flex-direction:column;gap:0.4rem">
+        <li>✓ Post prize pool & entry fee</li>
+        <li>✓ Set location, date & team limit</li>
+        <li>✓ See all registered teams</li>
+        <li>✓ Edit or close registration anytime</li>
+      </ul>
+      <a href="{{ url_for('register') }}" class="btn btn-outline btn-sm">Become an Organizer</a>
+    </div>
+    <div class="t-card">
+      <div style="font-size:2.5rem">⚽</div>
+      <h3>I'm a Player</h3>
+      <p style="color:var(--muted);font-size:0.9rem">
+        Find a tournament near you, create your team, add your squad with names,
+        positions and jersey numbers, and register in one go.
+      </p>
+      <ul style="color:var(--muted);font-size:0.85rem;list-style:none;display:flex;flex-direction:column;gap:0.4rem">
+        <li>✓ Browse open tournaments</li>
+        <li>✓ Build your team & squad</li>
+        <li>✓ Add jerseys & positions</li>
+        <li>✓ Manage your roster anytime</li>
+      </ul>
+      <a href="{{ url_for('register') }}" class="btn btn-outline btn-sm">Start Playing</a>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming tournaments -->
+{% if tournaments %}
+<section class="section">
+  <div class="section-head">
+    <div>
+      <h2>Upcoming tournaments</h2>
+      <p>Hot registrations opening right now.</p>
+    </div>
+    <a href="{{ url_for('tournaments') }}" class="btn btn-outline btn-sm">View all →</a>
+  </div>
+  <div class="grid grid-3">
+    {% for t in tournaments %}
+      <a href="{{ url_for('tournament_detail', tournament_id=t.id) }}" class="t-card">
+        <div class="t-card-head">
+          <h3>{{ t.name }}</h3>
+          <span class="t-status status-{{ t.status }}">{{ t.status }}</span>
+        </div>
+        <div class="t-meta">
+          <div class="t-meta-item"><span class="icon">📍</span> {{ t.location }}</div>
+          <div class="t-meta-item"><span class="icon">🗓️</span> {{ t.start_time|fmt_date }}</div>
+        </div>
+        <div class="t-stats">
+          <div class="t-stat"><span class="val" style="color:var(--gold)">{{ t.prize_pool|currency(t.currency) }}</span><span class="label">Prize Pool</span></div>
+          <div class="t-stat"><span class="val">{{ t.team_count }}/{{ t.max_teams }}</span><span class="label">Teams</span></div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

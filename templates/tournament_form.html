@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{% if edit %}Edit Tournament{% else %}New Tournament{% endif %}{% endblock %}
+
+{% block content %}
+<div class="form-wrap" style="max-width:680px">
+  <div class="form-card">
+    <h2>{% if edit %}Edit Tournament{% else %}Create a Tournament{% endif %}</h2>
+    <p class="sub">
+      {% if edit %}Update your tournament details.{% else %}Fill in the details and publish your tournament for team registrations.{% endif %}
+    </p>
+
+    <form method="POST" action="{% if edit %}{{ url_for('edit_tournament', tournament_id=tournament_id) }}{% else %}{{ url_for('create_tournament') }}{% endif %}">
+      <div class="form-group">
+        <label>Tournament Name</label>
+        <input type="text" name="name" class="form-control" placeholder="Summer Cup 2026" required
+               value="{{ form.get('name', '') if not edit else form.name }}">
+      </div>
+
+      <div class="form-group">
+        <label>Description <span class="opt">(optional)</span></label>
+        <textarea name="description" class="form-control" placeholder="Tell players about the format, rules, and what to expect...">{% if edit %}{{ form.description or '' }}{% else %}{{ form.get('description', '') }}{% endif %}</textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prize Pool</label>
+          <input type="number" name="prize_pool" class="form-control" step="0.01" min="0" placeholder="5000"
+                 value="{{ form.get('prize_pool', '0') if not edit else form.prize_pool }}" required>
+        </div>
+        <div class="form-group">
+          <label>Currency</label>
+          <select name="currency" class="form-control">
+            {% set currencies = ['USD','EUR','GBP','INR','PKR','BRL','NGN'] %}
+            {% for c in currencies %}
+              <option value="{{ c }}" {% if (not edit and form.get('currency','USD') == c) or (edit and form.currency == c) %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Location</label>
+        <input type="text" name="location" class="form-control" placeholder="City Sports Complex, Lahore" required
+               value="{{ form.get('location', '') if not edit else form.location }}">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Entry Fee</label>
+          <input type="number" name="entry_fee" class="form-control" step="0.01" min="0" placeholder="100"
+                 value="{{ form.get('entry_fee', '0') if not edit else form.entry_fee }}" required>
+        </div>
+        <div class="form-group">
+          <label>Max Teams</label>
+          <input type="number" name="max_teams" class="form-control" min="2" placeholder="16"
+                 value="{{ form.get('max_teams', '16') if not edit else form.max_teams }}" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Start Date & Time</label>
+        <input type="datetime-local" name="start_time" class="form-control" required
+               value="{{ form.get('start_time', '') if not edit else (form.start_time.strftime('%Y-%m-%dT%H:%M') if form.start_time else '') }}">
+      </div>
+
+      {% if edit %}
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status" class="form-control">
+          {% for s in ['open','closed','completed'] %}
+            <option value="{{ s }}" {% if form.status == s %}selected{% endif %}>{{ s|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <div class="actions" style="flex-direction:column;gap:0.75rem;margin-top:1.5rem">
+        <button type="submit" class="btn btn-primary btn-block btn-lg">{% if edit %}Save Changes{% else %}Publish Tournament{% endif %}</button>
+        <a href="{% if edit %}{{ url_for('tournament_detail', tournament_id=tournament_id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="btn btn-outline btn-block">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

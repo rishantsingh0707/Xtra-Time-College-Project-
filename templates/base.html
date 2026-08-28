@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Xtra Time{% endblock %} · Football Tournaments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="{{ url_for('index') }}" class="nav-logo">
+        <span class="ball">⚽</span>
+        Xtra<span class="accent">Time</span>
+      </a>
+      <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('tournaments') }}">Tournaments</a>
+        {% if current_user %}
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% endif %}
+      </div>
+      <div class="nav-user">
+        {% if current_user %}
+          <span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span>
+          <div class="nav-avatar">{{ current_user.username[0] }}</div>
+          <a href="{{ url_for('logout') }}" class="btn btn-outline btn-sm">Sign Out</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm">Sign In</a>
+          <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">Get Started</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">⚠ {{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="footer">
+    <p><span class="logo">XtraTime</span> — Organize and play football tournaments. Built with Python & Flask.</p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
